@@ -53,6 +53,8 @@ What works on a free Higgsfield account (tested November 2026):
   ffmpeg -i 01-pixel-art.png -vf "scale=144:-2:flags=area,split[a][b];[a]palettegen=max_colors=32[p];[b][p]paletteuse=dither=none" small.png
   ffmpeg -i small.png -vf "scale=iw*7:ih*7:flags=neighbor" -q:v 2 01-pixel-art.jpg
   ```
+- Clips: Kling 3.0 also needs a Basic plan. **Wan 3.0** (`wan3_0`) runs on free credits, at about 5 credits for 3 s at 720p with `generate_audio: false`. Pass each style's picture job ID as `start_image`, one job at a time; each takes 90 to 240 seconds. Ask for real cartoon motion (arms waving, the pet paddling, the kite fluttering) with a still camera, so the card visibly moves.
+- `import` loops every clip forwards and then backwards up to 40 seconds (`--loop` changes that), so each card keeps moving from the moment it appears to the end of the reel. For pixel art, pixelate the clip with the still's palette first, to exactly 720 wide (144 × 5), so the loop's hard-edge scaling keeps it crisp.
 - Turn the downloads into 1080-wide JPGs before `import`. The 2k PNGs are 4 to 7 MB each and slow the render down for no visible gain.
 
 ### Route B: HyperFrames does it all

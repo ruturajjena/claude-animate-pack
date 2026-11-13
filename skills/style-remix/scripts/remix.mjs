@@ -112,6 +112,15 @@ if (cmd === 'prompts') {
   if (plan.length) console.log(`total: about ${Math.round(planTotal)} credits`);
   else console.log(`wrote ${manifest(items)}`);
 } else if (cmd === 'import') {
+  // A 3-5 s clip has to keep a card moving for the whole reel, so it becomes a seamless
+  // forward-then-backward loop, repeated to --loop seconds (default 40), 720 px wide and silent.
+  const loopSecs = +(flag('loop') || 40);
+  const loopClip = (src, dst, hard = false) => {
+    // Pixel art keeps hard edges: nearest-neighbour scaling, never smoothing.
+    const vf = `fps=30,scale=720:-2:flags=${hard ? 'neighbor' : 'lanczos'},split[a][b];[b]reverse,trim=start_frame=1,setpts=PTS-STARTPTS[r];[a][r]concat=n=2:v=1:a=0,loop=loop=-1:size=32767,trim=duration=${loopSecs},setpts=PTS-STARTPTS`;
+    const r = spawnSync('ffmpeg', ['-v', 'error', '-y', '-i', src, '-an', '-vf', vf, '-c:v', 'libx264', '-crf', '20', '-preset', 'medium', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', dst], { stdio: 'inherit' });
+    if (r.status !== 0) die(`ffmpeg could not loop ${src}`);
+  };
   const from = path.resolve(rest[0] || die('import needs a folder'));
   // Files are matched to styles by a style word in the name, else by sorted order.
   const files = fs.readdirSync(from).filter((f) => /\.(png|jpe?g|webp|mp4|mov|webm)$/i.test(f)).sort();
@@ -128,7 +137,7 @@ if (cmd === 'prompts') {
     const clip = match(clips) || clips[i];
     const entry = { id: s.id, name: s.name, image: null, clip: null };
     if (img) { entry.image = `${nn(i)}-${s.id}${path.extname(img).toLowerCase()}`; fs.copyFileSync(path.join(from, img), path.join(out, entry.image)); }
-    if (clip) { entry.clip = `${nn(i)}-${s.id}${path.extname(clip).toLowerCase()}`; fs.copyFileSync(path.join(from, clip), path.join(out, entry.clip)); }
+    if (clip) { entry.clip = `${nn(i)}-${s.id}.mp4`; loopClip(path.join(from, clip), path.join(out, entry.clip), s.id === 'pixel-art'); }
     items.styles.push(entry);
     console.log(`${s.name.padEnd(18)} picture: ${img || '-'}  clip: ${clip || '-'}`);
   }

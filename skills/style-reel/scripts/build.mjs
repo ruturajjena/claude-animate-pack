@@ -114,8 +114,7 @@ const list = styles.map((st, i) => `
       <div class="row" id="row-${i}" style="top:${470 + i * Math.min(92, 900 / n)}px"><span class="num">${String(i + 1).padStart(2, '0')}</span><span class="name" id="name-${i}">${esc(st.name.toLowerCase())}</span></div>`).join('');
 
 const cards = styles.map((st, i) => {
-  const shownTill = i < n - 1 ? styleAt[i + 1] + 0.6 : T.grid + 0.6;
-  const vid = st.clip ? `\n        <video class="clip media" id="clip-${i}" data-start="${r3(Math.max(0, styleAt[i] - 0.1))}" data-duration="${r3(Math.max(0.5, shownTill - styleAt[i] + 0.1))}" src="${src(st.clip)}" muted playsinline></video>` : '';
+  const vid = st.clip ? `\n        <video class="clip media" id="clip-${i}" data-start="${r3(Math.max(0, styleAt[i] - 0.1))}" data-duration="${r3(Math.max(0.5, DUR - Math.max(0, styleAt[i] - 0.1)))}" src="${src(st.clip)}" muted playsinline></video>` : '';
   const img = st.image ? `<img class="media still" id="still-${i}" src="${src(st.image)}" alt="${esc(st.name)}">` : '';
   return `
       <div class="card" id="card-${i}" style="z-index:${10 + i}">
