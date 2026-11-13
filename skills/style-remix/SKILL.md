@@ -44,6 +44,17 @@ Then, in order, using the connector's image and video tools:
 
 Show the person each picture as it lands. Redo one only for a real fault (the subject changed, extra limbs, text in the picture), once.
 
+What works on a free Higgsfield account (tested November 2026):
+
+- GPT Image needs a Basic plan or higher. **Nano Banana Pro** (`nano_banana_pro`) runs on free credits, at about 2 credits a picture at 2k, and keeps the subject well when you pass the scene's job ID as an `image_references` media.
+- Free accounts take about one job at a time. A batch of ten mostly fails with `rate_limit_reached`, so send one, wait for it, then send the next. A picture takes about 40 seconds.
+- Pixel art comes back with pixels too fine to read on a small card. Make it chunky on the computer: shrink it to about 144 pixels wide, cut it to 32 colours, then enlarge it with hard edges:
+  ```bash
+  ffmpeg -i 01-pixel-art.png -vf "scale=144:-2:flags=area,split[a][b];[a]palettegen=max_colors=32[p];[b][p]paletteuse=dither=none" small.png
+  ffmpeg -i small.png -vf "scale=iw*7:ih*7:flags=neighbor" -q:v 2 01-pixel-art.jpg
+  ```
+- Turn the downloads into 1080-wide JPGs before `import`. The 2k PNGs are 4 to 7 MB each and slow the render down for no visible gain.
+
 ### Route B: HyperFrames does it all
 
 ```bash
