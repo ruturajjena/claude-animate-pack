@@ -15,7 +15,8 @@ const dir = path.resolve(dirArg);
 const flag = (n) => { const i = rest.indexOf(`--${n}`); return i < 0 ? null : rest[i + 1]; };
 const win = process.platform === 'win32';
 const run = (cmd, args) => {
-  const r = spawnSync(cmd, args, { cwd: dir, stdio: 'inherit', shell: win });
+  // On Windows npx is a .cmd shim, so the whole line goes through the shell.
+  const r = win ? spawnSync([cmd, ...args].join(' '), { cwd: dir, stdio: 'inherit', shell: true }) : spawnSync(cmd, args.map((x) => x.replace(/^"(.*)"$/, '$1')), { cwd: dir, stdio: 'inherit' });
   if (r.status !== 0) { console.error(`failed: ${cmd} ${args.join(' ')}`); process.exit(1); }
 };
 const hf = process.env.HYPERFRAMES_CMD ? process.env.HYPERFRAMES_CMD.split(' ') : ['npx', '-y', 'hyperframes'];

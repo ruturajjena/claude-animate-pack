@@ -63,7 +63,10 @@ function manifest(items) {
 // Run the HyperFrames CLI. HYPERFRAMES_CMD lets a plugin install point at its own launcher.
 function hf(args) {
   const base = process.env.HYPERFRAMES_CMD ? process.env.HYPERFRAMES_CMD.split(' ') : ['npx', '-y', 'hyperframes'];
-  const r = spawnSync(base[0], [...base.slice(1), ...args], { cwd: dir, encoding: 'utf8', shell: process.platform === 'win32' });
+  // On Windows npx is a .cmd shim, so the whole line goes through the shell (arguments quoted by q()).
+  const r = process.platform === 'win32'
+    ? spawnSync([...base, ...args].join(' '), { cwd: dir, encoding: 'utf8', shell: true })
+    : spawnSync(base[0], [...base.slice(1), ...args], { cwd: dir, encoding: 'utf8' });
   const text = `${r.stdout || ''}${r.stderr || ''}`;
   const json = text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1);
   try { return JSON.parse(json); } catch { return { ok: r.status === 0, raw: text.trim().slice(-600) }; }
@@ -77,12 +80,13 @@ if (cmd === 'prompts') {
   writePrompts();
   const plan = flag('plan') ? ['--plan'] : [];
   const items = { styles: [] };
+  let planTotal = 0;
   let scene = flag('scene-image') ? path.resolve(String(flag('scene-image'))) : path.join(out, '00-scene.png');
   if (!fs.existsSync(scene)) {
     console.log('making the scene...');
-    const r = hf(['media-use', 'generate', '--type', 'image', '--aspect', '9:16', '--prompt', q(scenePrompt()), '--out', path.relative(dir, scene), ...plan]);
+    const r = hf(['media-use', 'generate', '--type', 'image', '--aspect', '9:16', '--prompt', q(scenePrompt()), '--out', q(path.relative(dir, scene)), ...plan]);
     if (!r.ok && !r.plan) die(`scene failed: ${r.error || r.raw}\n${r.fix || ''}`);
-    if (r.plan) console.log(`scene: ${r.price?.credits} credits`);
+    if (r.plan) { planTotal += r.price?.credits || 0; console.log(`scene: ${r.price?.credits} credits`); }
   }
   items.scene = path.relative(out, scene).split(path.sep).join('/');
   for (const [i, s] of styles.entries()) {
@@ -90,19 +94,23 @@ if (cmd === 'prompts') {
     const clip = path.join(out, `${nn(i)}-${s.id}.mp4`);
     if (!fs.existsSync(img) || plan.length) {
       console.log(`${s.name}: picture...`);
-      const r = hf(['media-use', 'generate', '--type', 'image', '--reference', path.relative(dir, scene), '--aspect', '9:16', '--prompt', q(restyle(s)), '--out', path.relative(dir, img), ...plan]);
+      // A price check before the scene exists prices the picture without its reference.
+      const ref = fs.existsSync(scene) ? ['--reference', q(path.relative(dir, scene))] : [];
+      const r = hf(['media-use', 'generate', '--type', 'image', ...ref, '--aspect', '9:16', '--prompt', q(restyle(s)), '--out', q(path.relative(dir, img)), ...plan]);
       if (!r.ok && !r.plan) { console.error(`  failed: ${r.error || r.raw}`); continue; }
-      if (r.plan) console.log(`  ${r.price?.credits} credits`);
+      if (r.plan) { planTotal += r.price?.credits || 0; console.log(`  ${r.price?.credits} credits`); }
     }
     if (!flag('no-clips') && (!fs.existsSync(clip) || plan.length)) {
       console.log(`${s.name}: clip...`);
-      const r = hf(['media-use', 'generate', '--type', 'video', '--first-frame', path.relative(dir, img), '--seconds', '5', '--aspect', '9:16', '--prompt', q(animate(s)), '--out', path.relative(dir, clip), ...plan]);
+      const first = fs.existsSync(img) ? ['--first-frame', q(path.relative(dir, img))] : [];
+      const r = hf(['media-use', 'generate', '--type', 'video', ...first, '--seconds', '5', '--aspect', '9:16', '--prompt', q(animate(s)), '--out', q(path.relative(dir, clip)), ...plan]);
       if (!r.ok && !r.plan) console.error(`  failed: ${r.error || r.raw}`);
-      if (r.plan) console.log(`  ${r.price?.credits} credits`);
+      if (r.plan) { planTotal += r.price?.credits || 0; console.log(`  ${r.price?.credits} credits`); }
     }
     items.styles.push({ id: s.id, name: s.name, image: path.basename(img), clip: fs.existsSync(clip) ? path.basename(clip) : null });
   }
-  if (!plan.length) console.log(`wrote ${manifest(items)}`);
+  if (plan.length) console.log(`total: about ${Math.round(planTotal)} credits`);
+  else console.log(`wrote ${manifest(items)}`);
 } else if (cmd === 'import') {
   const from = path.resolve(rest[0] || die('import needs a folder'));
   // Files are matched to styles by a style word in the name, else by sorted order.
