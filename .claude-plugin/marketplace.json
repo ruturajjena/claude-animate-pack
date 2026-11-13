@@ -1,0 +1,14 @@
+{
+  "name": "explainedbyruturaj",
+  "owner": { "name": "ExplainedByRuturaj" },
+  "metadata": { "description": "Free Claude Code skills from ExplainedByRuturaj" },
+  "plugins": [
+    {
+      "name": "animate-pack",
+      "source": "./",
+      "description": "One scene in ten animation styles, and any script into an animated reel in your own voice.",
+      "version": "1.0.0",
+      "category": "creative"
+    }
+  ]
+}

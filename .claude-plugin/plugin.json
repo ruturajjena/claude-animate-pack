@@ -1,0 +1,10 @@
+{
+  "name": "animate-pack",
+  "version": "1.0.0",
+  "description": "One scene in ten animation styles, and any script into an animated reel in your own voice. Skills for Claude Code, built on HyperFrames.",
+  "author": { "name": "ExplainedByRuturaj", "url": "https://www.instagram.com/explainedbyruturaj/" },
+  "homepage": "https://github.com/ruturajjena/claude-animate-pack",
+  "repository": "https://github.com/ruturajjena/claude-animate-pack",
+  "license": "MIT",
+  "keywords": ["reels", "video", "animation", "hyperframes", "instagram", "shorts"]
+}

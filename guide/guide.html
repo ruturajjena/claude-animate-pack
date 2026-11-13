@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Claude Animate Pack: Setup Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&family=Playfair+Display:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 0; }
+  :root { --paper:#FAF6F0; --ink:#1D1A1F; --muted:#5E5560; --line:#E7DDD6; --coral:#E5414B; --plum:#5B2A55; --blush:#F6C9C9; --lilac:#D9CBF2; --card:#FFFFFF; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; background:var(--paper); color:var(--ink); font-family:Inter, sans-serif; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .page { width:210mm; height:297mm; padding:17mm 18mm 18mm; position:relative; overflow:hidden; page-break-after:always; background:var(--paper);
+          background-image:radial-gradient(#E9DED7 1.1px, transparent 1.2px); background-size:7mm 7mm; }
+  .page:last-child { page-break-after:auto; }
+  .foot { position:absolute; left:18mm; right:18mm; bottom:9mm; display:flex; justify-content:space-between; font:500 8pt 'JetBrains Mono', monospace; color:var(--muted); }
+  h1 { font:900 40pt/1 Inter; letter-spacing:-.03em; margin:0; }
+  h1 em, h2 em { font-family:'Playfair Display', serif; font-weight:400; font-style:italic; color:var(--plum); letter-spacing:-.01em; }
+  h2 { font:900 22pt/1.1 Inter; letter-spacing:-.025em; margin:0 0 4mm; }
+  h3 { font:800 12.5pt/1.25 Inter; margin:6mm 0 2mm; }
+  p, li { font:400 10.5pt/1.55 Inter; margin:0 0 2.6mm; }
+  ul, ol { padding-left:5.5mm; margin:0 0 3mm; }
+  .kicker { font:700 8.5pt 'JetBrains Mono', monospace; color:var(--coral); letter-spacing:.08em; text-transform:uppercase; margin-bottom:3mm; }
+  .lead { font:500 12.5pt/1.5 Inter; color:var(--muted); }
+  code, .mono { font-family:'JetBrains Mono', monospace; font-size:9pt; }
+  p code, li code, td code { background:#F1E8E2; padding:.3mm 1.4mm; border-radius:1.2mm; }
+  pre { background:#17141a; color:#EFE7F4; border-radius:3mm; padding:3.4mm 4mm; margin:2mm 0 4mm; font:500 8.8pt/1.55 'JetBrains Mono', monospace; white-space:pre-wrap; word-break:break-word; }
+  pre .c { color:#9C8FA8; }
+  .card { background:var(--card); border-radius:4mm; padding:5mm 6mm; box-shadow:0 2mm 6mm -3mm rgba(60,30,60,.25); margin-bottom:4mm; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:4mm; }
+  .grid4 { display:grid; grid-template-columns:repeat(4,1fr); gap:3mm; }
+  .tag { display:inline-block; font:700 8pt 'JetBrains Mono', monospace; padding:.8mm 2.4mm; border-radius:10mm; background:var(--coral); color:#fff; margin-right:1.5mm; }
+  .tag.plum { background:var(--plum); } .tag.soft { background:#F1E8E2; color:var(--ink); }
+  table { width:100%; border-collapse:collapse; margin:2mm 0 4mm; }
+  th, td { text-align:left; vertical-align:top; padding:1.8mm 2.4mm; border-bottom:.3mm solid var(--line); font:400 9.6pt/1.45 Inter; }
+  th { font:700 8.5pt 'JetBrains Mono', monospace; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; }
+  .step { display:flex; gap:4mm; margin:0 0 4mm; }
+  .num { flex:none; width:9mm; height:9mm; border-radius:50%; background:var(--coral); color:#fff; font:800 11pt/9mm Inter; text-align:center; }
+  .step > div:not(.num) { flex:1; min-width:0; }
+  .step h3 { margin-top:1mm; }
+  .note { border-left:1.2mm solid var(--plum); background:#F3ECF3; padding:3mm 4mm; border-radius:0 3mm 3mm 0; margin:2mm 0 4mm; }
+  .note p:last-child { margin:0; }
+  .shot { width:100%; border-radius:3mm; border:1.2mm solid #fff; box-shadow:0 2mm 6mm -3mm rgba(60,30,60,.35); display:block; }
+  .glow { position:absolute; border-radius:50%; filter:blur(22mm); opacity:.7; z-index:0; }
+  .cover .glow.a { width:150mm; height:150mm; left:-50mm; top:-40mm; background:var(--blush); }
+  .cover .glow.b { width:160mm; height:160mm; right:-60mm; bottom:-20mm; background:var(--lilac); }
+  .cover > *:not(.glow):not(.foot) { position:relative; z-index:1; }
+  .cover .foot { z-index:1; }
+  .bigtitle { font:900 50pt/.95 Inter; letter-spacing:-.04em; margin:8mm 0 5mm; }
+  .bigtitle em { font-family:'Playfair Display', serif; font-weight:400; font-style:italic; color:var(--plum); }
+  .toc li { font:600 10.5pt/1.75 Inter; margin:0; }
+  .toc span { font:500 9pt 'JetBrains Mono', monospace; color:var(--coral); margin-right:3mm; }
+  .prompt { background:#fff; border:.3mm solid var(--line); border-radius:2.5mm; padding:2mm 3mm; font:500 8pt/1.45 'JetBrains Mono', monospace; margin:.6mm 0 1.8mm; }
+  .pname { font:800 9.5pt Inter; margin-top:1.4mm; }
+  .pname span { color:var(--coral); font:700 8.5pt 'JetBrains Mono', monospace; margin-right:2mm; }
+</style>
+</head>
+<body>
+
+<!-- 1. Cover -->
+<section class="page cover">
+  <div class="glow a"></div><div class="glow b"></div>
+  <div class="kicker">ExplainedByRuturaj · free skill pack</div>
+  <div class="bigtitle">Claude<br><em>Animate Pack</em></div>
+  <p class="lead" style="max-width:150mm">Redraw one scene in ten animation styles. Turn any script into an animated reel, voiced in your own voice, from one prompt in Claude.</p>
+  <div class="grid4" style="margin:7mm 0 6mm">
+    <img class="shot" src="img/demo-1.8.jpg" alt="">
+    <img class="shot" src="img/demo-6.8.jpg" alt="">
+    <img class="shot" src="img/demo-13.6.jpg" alt="">
+    <img class="shot" src="img/demo-17.5.jpg" alt="">
+  </div>
+  <h3>In this guide</h3>
+  <ol class="toc" style="list-style:none;padding:0">
+    <li><span>01</span>What's in the pack</li>
+    <li><span>02</span>Fast lane: 10 styles in Claude chat, no install</li>
+    <li><span>03</span>Install Claude Code, HyperFrames and the pack</li>
+    <li><span>04</span>Your first reel from a script</li>
+    <li><span>05</span>One scene, ten styles: the full reel</li>
+    <li><span>06</span>Your voice, music and posting</li>
+    <li><span>07</span>When something goes wrong</li>
+    <li><span>08</span>All 10 style prompts, word for word</li>
+  </ol>
+  <div class="foot"><span>github.com/ruturajjena/claude-animate-pack</span><span>@explainedbyruturaj</span></div>
+</section>
+
+<!-- 2. What's inside -->
+<section class="page">
+  <div class="kicker">01 · What's in the pack</div>
+  <h2>Four skills and <em>ten prompts</em></h2>
+  <p class="lead">A skill is a set of instructions plus small scripts that Claude reads when it needs them. Install the pack once, then just ask in plain words.</p>
+  <table>
+    <tr><th style="width:30%">Skill</th><th>What it does</th><th style="width:28%">Say</th></tr>
+    <tr><td><b>animate-setup</b></td><td>Checks your computer and tells you how to fix anything missing.</td><td>"Set up the animate pack"</td></tr>
+    <tr><td><b>style-remix</b></td><td>Writes the prompts for your scene in 10 styles. It can also make the pictures and clips itself, or bring in files you made with another tool.</td><td>"Redraw my scene in 10 styles"</td></tr>
+    <tr><td><b>style-reel</b></td><td>Builds the "one scene, ten styles" reel, timed to your voice, with your own video in the middle.</td><td>"Make the styles reel"</td></tr>
+    <tr><td><b>script-to-reel</b></td><td>Turns any script into an animated reel with captions, titles, counting numbers, lists, chat bubbles, code, pictures and videos.</td><td>"Make a reel from this script"</td></tr>
+  </table>
+  <h3>Two ways to use it</h3>
+  <div class="grid2">
+    <div class="card"><span class="tag">fast lane</span><h3>Claude chat + Higgsfield</h3><p>Make the 10 styled pictures and clips by pasting prompts in Claude. No install. You need a Higgsfield account with credits.</p><p><b>Time:</b> about 15 minutes. Go to <b>section 02</b>.</p></div>
+    <div class="card"><span class="tag plum">full pack</span><h3>Claude Code + HyperFrames</h3><p>Make finished reels with your voice and captions, rendered on your own computer. One-time setup.</p><p><b>Time:</b> about 30 minutes to set up, then a few minutes per reel. Go to <b>section 03</b>.</p></div>
+  </div>
+  <h3>What it costs</h3>
+  <table>
+    <tr><th>Part</th><th>Cost</th></tr>
+    <tr><td>The pack, HyperFrames, rendering, captions, the free voice</td><td>Free. Runs on your computer.</td></tr>
+    <tr><td>Claude Code</td><td>Needs a paid Claude plan (Pro or above) or an API key.</td></tr>
+    <tr><td>AI pictures and clips</td><td>Credits on the tool you choose (Higgsfield, a HyperFrames Pro plan, ChatGPT, Gemini…). The skill tells you how much before it makes anything.</td></tr>
+  </table>
+  <div class="foot"><span>Claude Animate Pack · setup guide</span><span>2</span></div>
+</section>
+
+<!-- 3. Fast lane -->
+<section class="page">
+  <div class="kicker">02 · Fast lane</div>
+  <h2>Ten styles in <em>Claude chat</em></h2>
+  <p class="lead">This works in claude.ai, the Claude desktop app or the phone app. Nothing to install.</p>
+  <div class="step"><div class="num">1</div><div><h3>Connect Higgsfield to Claude</h3><p>In Claude, open <b>Settings → Connectors</b>, find <b>Higgsfield</b> and connect it, then sign in to your Higgsfield account. The menu names may move a little between app versions. Higgsfield makes the pictures and clips with your own Higgsfield credits.</p></div></div>
+  <div class="step"><div class="num">2</div><div><h3>Ask for your scene</h3><p>Paste the scene prompt from section 08, with the three brackets filled in. Keep it simple: one subject, one pose, a plain background, lots of sky.</p></div></div>
+  <div class="step"><div class="num">3</div><div><h3>Redraw it, one style at a time</h3><p>Paste a style prompt. Each one starts with "Redraw the scene in the last image as…". If Claude has made other pictures since, say <i>"use the first scene picture"</i>. Always redraw from the scene, never from the last style, or your subject slowly changes.</p></div></div>
+  <div class="step"><div class="num">4</div><div><h3>Animate each one</h3><p>Ask: <i>"Animate it into a 3 second clip. The camera stays still."</i> Use the shortest length the tool allows. Then swap the style and repeat.</p></div></div>
+  <div class="step"><div class="num">5</div><div><h3>Download everything into one folder</h3><p>Name the files with the style in the name (<code>claymation.png</code>, <code>claymation.mp4</code>…). That folder is all the <b>style-reel</b> skill needs to build the reel. See section 05.</p></div></div>
+  <div class="note"><p><b>No Higgsfield?</b> The same prompts work in ChatGPT, Gemini, Midjourney, Kling or any tool that edits a picture from a reference. With a HyperFrames Pro plan, the <b>style-remix</b> skill can make all ten pictures and clips for you with one command.</p></div>
+  <div class="note"><p><b>Use the skill in claude.ai too.</b> Zip the <code>skills/style-remix</code> folder and upload it in Claude under <b>Settings → Capabilities → Skills</b>. Claude then knows the prompts and the order without you pasting them.</p></div>
+  <div class="foot"><span>Claude Animate Pack · setup guide</span><span>3</span></div>
+</section>
+
+<!-- 4. Install -->
+<section class="page">
+  <div class="kicker">03 · Install, once</div>
+  <h2>Set up the <em>full pack</em></h2>
+  <p>Open a terminal. On Windows, that's <b>PowerShell</b>. On a Mac, it's <b>Terminal</b>. Run each line, and after installing anything, <b>close and reopen the terminal</b> so it finds the new program.</p>
+  <div class="step"><div class="num">1</div><div><h3>Node.js, FFmpeg and Git</h3>
+<pre><span class="c"># Windows</span>
+winget install OpenJS.NodeJS.LTS
+winget install Gyan.FFmpeg
+winget install Git.Git
+<span class="c"># Mac (needs Homebrew from brew.sh)</span>
+brew install node ffmpeg git</pre></div></div>
+  <div class="step"><div class="num">2</div><div><h3>Claude Code</h3><p>Use the <b>Code</b> tab in the Claude desktop app, or install it in the terminal:</p>
+<pre><span class="c"># Windows (PowerShell)</span>
+irm https://claude.ai/install.ps1 | iex
+<span class="c"># Mac or Linux</span>
+curl -fsSL https://claude.ai/install.sh | bash</pre><p>Then make a folder for your videos, open it in the terminal and type <code>claude</code>. Sign in when it asks.</p></div></div>
+  <div class="step"><div class="num">3</div><div><h3>HyperFrames and the Animate Pack</h3><p>HyperFrames (free, by HeyGen) renders HTML into video. Its skills teach Claude the format. The pack adds the reels.</p>
+<pre>claude plugin marketplace add heygen-com/hyperframes
+claude plugin install hyperframes@hyperframes
+claude plugin marketplace add ruturajjena/claude-animate-pack
+claude plugin install animate-pack@explainedbyruturaj</pre><p>You can also type these inside Claude Code with a slash: <code>/plugin marketplace add …</code>. Then restart Claude Code.</p></div></div>
+  <div class="step"><div class="num">4</div><div><h3>Check everything</h3><p>In Claude Code, say <b>"set up the animate pack"</b>. It runs a check and walks you through anything missing:</p>
+<pre>OK    Node.js 22+   ·   OK  FFmpeg   ·   OK  HyperFrames CLI
+MISS  Free voice (optional)  pip install kokoro-onnx soundfile</pre></div></div>
+  <div class="foot"><span>Claude Animate Pack · setup guide</span><span>4</span></div>
+</section>
+
+<!-- 5. First reel -->
+<section class="page">
+  <div class="kicker">04 · Your first reel</div>
+  <h2>Script in, <em>reel out</em></h2>
+  <p class="lead">Paste a script and say what you want. Claude does the steps below with the <b>script-to-reel</b> skill. You only check the result.</p>
+  <div class="grid2" style="grid-template-columns:1.25fr 1fr">
+    <div>
+      <div class="step"><div class="num">1</div><div><h3>Say it</h3><p><i>"Make a reel from this script, in my voice from take.m4a: …"</i> Write about 2.5 words a second, so 30 seconds is roughly 75 words. Use short sentences, one idea each.</p></div></div>
+      <div class="step"><div class="num">2</div><div><h3>Voice and word timings</h3><p>Claude converts your recording, or makes the free voice, and transcribes it on your computer. That gives every word its exact time.</p></div></div>
+      <div class="step"><div class="num">3</div><div><h3>Beats</h3><p>Claude writes <code>beats.json</code>: one animated beat per idea, each starting on the word that says it. The beat types are title, stat, list, chat, code, image, video, quote and cta.</p></div></div>
+      <div class="step"><div class="num">4</div><div><h3>Check, look, render</h3><p>It runs <code>npx hyperframes check</code>, looks at frames, fixes problems, then renders <code>out/reel.mp4</code> (1080×1920).</p></div></div>
+    </div>
+    <div>
+      <img class="shot" src="img/demo-13.6.jpg" alt="" style="margin-bottom:3mm">
+      <p class="mono" style="color:var(--muted);font-size:8pt">A list beat: each step pops in on the word that says it. Captions follow the voice.</p>
+    </div>
+  </div>
+  <h3>Change anything by asking</h3>
+  <ul>
+    <li><i>"Make the hook a big number."</i> · <i>"Use the night look."</i> · <i>"Put my screen recording in the third beat."</i></li>
+    <li><i>"Change the comment word to GUIDE."</i> · <i>"Add music from assets/music.mp3, quiet."</i></li>
+    <li>To watch and scrub through it in your browser: <i>"open the preview"</i> (<code>npx hyperframes preview</code>).</li>
+  </ul>
+  <div class="note"><p><b>Try the demo first.</b> The pack has <code>examples/script-to-reel-demo</code>. Say <i>"build the script-to-reel demo"</i> to see it work end to end before writing your own.</p></div>
+  <div class="foot"><span>Claude Animate Pack · setup guide</span><span>5</span></div>
+</section>
+
+<!-- 6. Style reel -->
+<section class="page">
+  <div class="kicker">05 · One scene, ten styles</div>
+  <h2>The <em>styles</em> reel</h2>
+  <p class="lead">The reel runs in five parts, all timed to your voice: a fast list of styles where each card flips in on its name, a grid of all ten, your own video playing in a phone, "comment WORD", and "save this".</p>
+  <div class="step"><div class="num">1</div><div><h3>Pictures and clips</h3><p>Say <i>"Redraw my scene in 10 styles: [your idea]"</i>. The <b>style-remix</b> skill offers three routes:</p>
+    <table>
+      <tr><td style="width:24%"><span class="tag">A</span>Higgsfield</td><td>Connector in Claude. Claude makes them while you watch.</td></tr>
+      <tr><td><span class="tag plum">B</span>HyperFrames</td><td>With a Pro plan, one command makes all 10 pictures and clips: <code>remix.mjs make</code>.</td></tr>
+      <tr><td><span class="tag soft">C</span>Any tool</td><td>Make them anywhere, put them in one folder, then: <i>"import my styles from this folder"</i>.</td></tr>
+    </table></div></div>
+  <div class="step"><div class="num">2</div><div><h3>The script</h3><p>Keep the pattern: the ten style names in one breath, one line on how, one line about your middle video, then the comment CTA, then "save this". Here's an example:</p>
+<pre>Pixel art, claymation, toy bricks, comic book, paper cutout, retro anime,
+low poly, knitted wool, risograph, miniature diorama.
+Ten styles from one scene, with one prompt each, right inside Claude.
+And whole reels like this one, animated in my own voice from one script?
+That's my free skill pack.
+Comment ANIMATE and I'll send you all ten prompts, the skill pack and the setup guide.
+Save this so you don't lose it.</pre></div></div>
+  <div class="step"><div class="num">3</div><div><h3>Build it</h3><p>Say <i>"Make the styles reel with my voice, and put my last reel in the middle."</i> Claude copies <code>reel.example.json</code>, sets your title, handle, comment word and middle video, then builds, checks and renders it.</p></div></div>
+  <div class="note"><p><b>Your comment word must match your auto-DM keyword</b>, or people who comment get nothing.</p></div>
+  <div class="foot"><span>Claude Animate Pack · setup guide</span><span>6</span></div>
+</section>
+
+<!-- 7. Voice, music, posting + troubleshooting -->
+<section class="page">
+  <div class="kicker">06 · Voice, music, posting</div>
+  <h2>Sound like <em>you</em></h2>
+  <table>
+    <tr><th style="width:28%">Voice</th><th>How</th><th style="width:22%">Quality</th></tr>
+    <tr><td>Your own recording</td><td>Record on your phone in a quiet room, holding it about a hand's width from your mouth. Give Claude the file.</td><td>Best</td></tr>
+    <tr><td>A clone of your voice</td><td>ElevenLabs, or Voicebox (free, runs on your computer). Export the audio and give Claude the file.</td><td>Great</td></tr>
+    <tr><td>Free on-device voice</td><td><code>pip install kokoro-onnx soundfile</code> once, then ask for "the free voice".</td><td>Good for drafts</td></tr>
+  </table>
+  <p><b>Music:</b> use only tracks you have the rights to, such as your phone editor's library or a royalty-free site. Keep it quiet under the voice. The default level is 0.12. You can also add trending audio in Instagram itself when you post.</p>
+  <p><b>Before posting:</b> watch it once with the sound off. If the captions alone tell the story, it's ready. Check any numbers or claims the reel shows.</p>
+
+  <div class="kicker" style="margin-top:7mm">07 · When something goes wrong</div>
+  <table>
+    <tr><th style="width:38%">You see</th><th>Do this</th></tr>
+    <tr><td><code>node</code>, <code>npx</code> or <code>ffmpeg</code> "not recognized"</td><td>Close and reopen the terminal and Claude after installing. Then run the check again.</td></tr>
+    <tr><td>The skills don't show up</td><td>Restart Claude Code. Type <code>/plugin</code> and check that animate-pack is enabled.</td></tr>
+    <tr><td>"Check failed"</td><td>Say <i>"fix the check errors"</i>. Usually it's text over text or text too small. Warnings about short captions are normal.</td></tr>
+    <tr><td>"HyperFrames Pro feature"</td><td>Making pictures with HyperFrames needs Pro. Use route A or C instead. Nothing was charged.</td></tr>
+    <tr><td>"kokoro-onnx is not installed"</td><td><code>pip install kokoro-onnx soundfile</code>, or use your own recording.</td></tr>
+    <tr><td>A caption word is spelled wrong</td><td>Make sure <code>script.txt</code> matches what was said, word for word, then build again.</td></tr>
+    <tr><td>A style card lands at the wrong moment</td><td>Say <i>"the claymation card is late"</i>. Claude adds the word as it was heard.</td></tr>
+    <tr><td>Rendering is slow</td><td>Normal for the first render. For quick previews: <code>--quality draft</code>.</td></tr>
+  </table>
+  <div class="foot"><span>Claude Animate Pack · setup guide</span><span>7</span></div>
+</section>
+
+<!-- 8. Prompts -->
+<section class="page" id="prompts">
+  <div class="kicker">08 · The 10 style prompts</div>
+  <h2>Copy, paste, <em>done</em></h2>
+  <p><b>Scene</b> (fill in the brackets):</p>
+  <div class="prompt">Make a vertical 9:16 image. One subject: [who, what they wear]. One pose: [what they are doing, caught mid-action]. A simple background: [two or three things, e.g. a grassy cliff, the sea, one kite in a blue sky]. Full body in frame, subject centred, clear empty sky above. Bright, clean cartoon illustration. No text, no letters, no logos, no watermark.</div>
+  <p><b>Each style:</b> paste this, then add the style's line below.</p>
+  <div class="prompt">Redraw the scene in the last image as [style]. Keep the exact same subject, pose, camera angle and layout, and the same colours wherever the style allows. [style line] Vertical 9:16. No text, no letters, no logos, no watermark.</div>
+  <p style="margin-top:3mm"><b>Animate</b> (one styled picture at a time):</p>
+  <div class="prompt">Animate this image into a 3 second clip (use the shortest length the tool allows). The camera stays completely still. Only small movements: the subject bobs gently at the top of the action, hair and clothes move a little, background details sway, clouds drift slowly. Keep the [style] look in every frame. No text.</div>
+  <h3>Tips that save credits</h3>
+  <ul>
+    <li><b>Always redraw from the scene picture</b>, never from the previous style. Otherwise the subject drifts a little with every redraw.</li>
+    <li>Simple scenes survive: one subject, one pose, a plain background, lots of empty sky. Crowds, small hands holding small things, and text do not.</li>
+    <li>No text in pictures. Words go in the video, where they stay sharp.</li>
+    <li>If a style changes your subject, redo it once: <i>"Same again, but keep the subject exactly as in the scene picture."</i></li>
+    <li>Your own photo works as the scene too. Only use photos of people who said yes.</li>
+  </ul>
+  <div class="note"><p>Every prompt is also in the repo as <code>prompts/10-styles.md</code>, ready to copy, and in <code>skills/style-remix/styles.json</code> for the skill.</p></div>
+  <div class="foot"><span>Claude Animate Pack · setup guide</span><span>8</span></div>
+</section>
+
+<section class="page">
+  <div class="kicker">08 · The 10 style prompts</div>
+  <h2>The ten <em>style lines</em></h2>
+  <p>Put each line where the template says <code>[style line]</code>, and its name where it says <code>[style]</code>.</p>
+  <!--STYLES-->
+  <div class="foot"><span>Free · MIT · github.com/ruturajjena/claude-animate-pack</span><span>9</span></div>
+</section>
+
+</body>
+</html>

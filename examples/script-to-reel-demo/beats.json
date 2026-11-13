@@ -1,0 +1,15 @@
+{
+  "title": "Demo reel",
+  "look": "paper",
+  "brand": "@yourhandle",
+  "beats": [
+    { "at": "most", "type": "stat", "kicker": "editing one short video", "value": "3 hrs", "label": "is what *most people* spend" },
+    { "at": "here is", "type": "title", "text": "The *faster* way." },
+    { "at": "write your", "type": "chat", "prompt": "Here is my script. Make it a reel.", "reply": "Timing every word now...", "replyAt": "build" },
+    { "at": "step one", "type": "list", "heading": "three steps", "items": [
+      { "text": "Record your voice", "at": "record" },
+      { "text": "Claude times every word", "at": "times" },
+      { "text": "Each line gets animated", "at": "animates" } ] },
+    { "at": "comment", "type": "cta", "small": "comment", "word": "REEL", "lines": [ { "text": "and I'll send you the skill", "at": "send" } ] }
+  ]
+}

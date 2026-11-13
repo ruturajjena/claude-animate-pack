@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "scene": {
+    "about": "Step 1. One picture that every style redraws. Fill in the three brackets.",
+    "prompt": "Make a vertical 9:16 image. One subject: [who, what they wear]. One pose: [what they are doing, caught mid-action]. A simple background: [two or three things, e.g. a grassy cliff, the sea, one kite in a blue sky]. Full body in frame, subject centred, clear empty sky above. Bright, clean cartoon illustration. No text, no letters, no logos, no watermark."
+  },
+  "restyle": {
+    "about": "Step 2. Run once per style, always on the same scene picture.",
+    "template": "Redraw the scene in the last image as {style}. Keep the exact same subject, pose, camera angle and layout, and the same colours wherever the style allows. {look} Vertical 9:16. No text, no letters, no logos, no watermark."
+  },
+  "animate": {
+    "about": "Step 3. Turn each styled picture into a short clip.",
+    "template": "Animate this image into a 3 second clip (use the shortest length the tool allows). The camera stays completely still. Only small movements: {motion}. Keep the {style} look in every frame. No text.",
+    "motion": "the subject bobs gently at the top of the action, hair and clothes move a little, background details sway, clouds drift slowly"
+  },
+  "styles": [
+    {
+      "id": "pixel-art",
+      "name": "Pixel art",
+      "look": "16-bit pixel art from a 1990s console game: chunky square pixels you can see, a limited palette of about 32 colours, hard edges with no blur or smoothing, a simple dithered sky."
+    },
+    {
+      "id": "claymation",
+      "name": "Claymation",
+      "look": "Stop-motion claymation: every object sculpted from matte plasticine with fingerprints and tool marks, soft studio light, a little tilt-shift depth of field, a handmade feel."
+    },
+    {
+      "id": "toy-bricks",
+      "name": "Toy bricks",
+      "look": "Built entirely from plastic toy construction bricks, the person as a small block-built toy figure, glossy studs on every brick, brick clouds and brick grass, macro toy-photography lighting. No brand names or logos."
+    },
+    {
+      "id": "comic-book",
+      "name": "Comic book",
+      "look": "A classic comic book panel: bold black ink outlines, flat bright colours, halftone dots in the shading, a jagged action burst behind the subject. No speech bubbles, no sound words, no text."
+    },
+    {
+      "id": "paper-cutout",
+      "name": "Paper cutout",
+      "look": "Layered paper cutout craft: every shape cut from coloured card with visible paper fibres, soft drop shadows between the layers, shallow depth like a shadow box seen from the front."
+    },
+    {
+      "id": "retro-anime",
+      "name": "Retro anime",
+      "look": "1990s hand-painted cel anime: clean ink lines, two-tone cel shading, a soft painted watercolour sky, warm film grain and slightly faded colours."
+    },
+    {
+      "id": "low-poly",
+      "name": "Low poly",
+      "look": "A low poly 3D render: everything made of flat-shaded triangles, simple faceted clouds, soft pastel light, a clean toy-like finish."
+    },
+    {
+      "id": "knitted-wool",
+      "name": "Knitted wool",
+      "look": "Knitted and crocheted wool: every surface made of yarn stitches with visible knit texture, felt clouds, a cosy handmade-toy look in soft daylight."
+    },
+    {
+      "id": "risograph",
+      "name": "Risograph",
+      "look": "A two-colour risograph print: only fluorescent pink and blue ink on off-white paper, grainy texture, the two colour layers slightly out of register, paper showing through."
+    },
+    {
+      "id": "miniature-diorama",
+      "name": "Miniature diorama",
+      "look": "A handmade miniature diorama on a wooden tabletop: a tiny painted figure, model-railway grass, cotton-wool clouds on thin wires, shot with a macro lens and strong tilt-shift blur, a real room softly out of focus behind."
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "name": "One scene, ten styles",
+  "tag": "made in claude · steal the prompts",
+  "title": [
+    "One scene,",
+    "ten styles."
+  ],
+  "voice": "assets/voice.wav",
+  "transcript": "transcript.json",
+  "music": "assets/bgm/bed-ducked.wav",
+  "musicVolume": 0.12,
+  "brand": "@yourhandle",
+  "cues": {
+    "grid": "ten",
+    "middle": "whole",
+    "cta": "comment",
+    "save": "save"
+  },
+  "pills": [
+    {
+      "text": "1 scene",
+      "at": "scene"
+    },
+    {
+      "text": "1 prompt each",
+      "at": "prompt"
+    },
+    {
+      "text": "in Claude",
+      "at": "claude"
+    }
+  ],
+  "middle": {
+    "src": "assets/middle.mp4",
+    "mediaStart": 0,
+    "tag": "and whole reels, in my voice",
+    "title": "from one script.",
+    "sticker": "FREE",
+    "stickerAt": "free"
+  },
+  "cta": {
+    "small": "comment",
+    "word": "ANIMATE",
+    "lines": [
+      {
+        "text": "all 10 prompts",
+        "at": "prompts"
+      },
+      {
+        "text": "the skill pack",
+        "at": "skill"
+      },
+      {
+        "text": "the setup guide (PDF)",
+        "at": "setup"
+      }
+    ]
+  },
+  "saveSub": "so you don't lose it"
+}
