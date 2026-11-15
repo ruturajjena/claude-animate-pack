@@ -79,13 +79,28 @@ const r3 = (x) => +(+x).toFixed(3);
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const src = (f) => `assets/styles/${f}`;
 
+// A spoken intro longer than about a second would leave frame one empty; open on the first card.
+const OPEN_EARLY = cfg.openOnFirstCard ?? styleAt[0] > 1.2;
+
 // Big card and grid geometry (1080 x 1920 frame).
 const CARD = { x: 440, y: 430, w: 540, h: 960 };
-const cols = Math.min(5, Math.ceil(n / 2));
-const rows = Math.ceil(n / cols);
-const gap = 16;
-const tileW = Math.floor((1080 - 2 * 52 - (cols - 1) * gap) / cols);
-const tileH = Math.round((tileW * 16) / 9);
+// The grid block (rows x (tile + label)) must stay within 764 px, so the CTA and save card
+// still fit under it once the grid slides up. Up to 10 styles that is 2 rows of 5; for more,
+// pick the column count that gives the biggest tiles. Past 12 styles the tiles are too small
+// for readable labels, so the labels are left out (the numbered list already names each one).
+const showLabels = cfg.gridLabels ?? n <= 12;
+const labelGap = showLabels ? 58 : 22;
+const MAX_BLOCK = 764;
+let G = null;
+for (let c = Math.min(5, Math.ceil(n / 2)); c <= Math.min(10, n); c++) {
+  const r = Math.ceil(n / c), g = c > 5 ? 12 : 16;
+  const byWidth = Math.round((Math.floor((1080 - 2 * 52 - (c - 1) * g) / c) * 16) / 9);
+  const h = Math.min(byWidth, Math.floor(MAX_BLOCK / r - labelGap));
+  if (!G || h > G.h) G = { cols: c, rows: r, gap: g, h };
+}
+const { cols, rows, gap } = G;
+const tileH = G.h;
+const tileW = Math.round((tileH * 9) / 16);
 const s = tileW / CARD.w;
 const gridTop = 430;
 const tile = (i) => {
@@ -93,7 +108,7 @@ const tile = (i) => {
   const rowCount = r === rows - 1 ? n - cols * (rows - 1) : cols;
   const rowW = rowCount * tileW + (rowCount - 1) * gap;
   const x0 = (1080 - rowW) / 2;
-  return { x: x0 + c * (tileW + gap), y: gridTop + r * (tileH + 58) };
+  return { x: x0 + c * (tileW + gap), y: gridTop + r * (tileH + labelGap) };
 };
 // GSAP moves each card from its deck spot to its tile with x, y and scale about the centre.
 const toTile = (i) => { const t = tile(i); return { x: r3(t.x + tileW / 2 - (CARD.x + CARD.w / 2)), y: r3(t.y + tileH / 2 - (CARD.y + CARD.h / 2)), scale: r3(s) }; };
@@ -114,7 +129,8 @@ const list = styles.map((st, i) => `
       <div class="row" id="row-${i}" style="top:${470 + i * Math.min(92, 900 / n)}px"><span class="num">${String(i + 1).padStart(2, '0')}</span><span class="name" id="name-${i}">${esc(st.name.toLowerCase())}</span></div>`).join('');
 
 const cards = styles.map((st, i) => {
-  const vid = st.clip ? `\n        <video class="clip media" id="clip-${i}" data-start="${r3(Math.max(0, styleAt[i] - 0.1))}" data-duration="${r3(Math.max(0.5, DUR - Math.max(0, styleAt[i] - 0.1)))}" src="${src(st.clip)}" muted playsinline></video>` : '';
+  const vs = i === 0 && OPEN_EARLY ? 0 : Math.max(0, styleAt[i] - 0.1);
+  const vid = st.clip ? `\n        <video class="clip media" id="clip-${i}" data-start="${r3(vs)}" data-duration="${r3(Math.max(0.5, DUR - vs))}" src="${src(st.clip)}" muted playsinline></video>` : '';
   const img = st.image ? `<img class="media still" id="still-${i}" src="${src(st.image)}" alt="${esc(st.name)}">` : '';
   return `
       <div class="card" id="card-${i}" style="z-index:${10 + i}">
@@ -125,7 +141,7 @@ const cards = styles.map((st, i) => {
       </div>`;
 }).join('');
 
-const glabels = styles.map((st, i) => { const t = tile(i); return `<div class="glabel" id="gl-${i}" style="left:${t.x}px;top:${t.y + tileH + 12}px;width:${tileW}px">${esc(st.name.toLowerCase())}</div>`; }).join('');
+const glabels = !showLabels ? "" : styles.map((st, i) => { const t = tile(i); return `<div class="glabel" id="gl-${i}" style="left:${t.x}px;top:${t.y + tileH + 12}px;width:${tileW}px">${esc(st.name.toLowerCase())}</div>`; }).join('');
 
 const pills = (cfg.pills || []).map((p, i) => `<div class="pill" id="pill-${i}">${esc(p.text)}</div>`).join('');
 const ctaLines = (cfg.cta.lines || []).map((l, i) => `<div class="cline" id="cl-${i}"><span class="tick">✓</span>${esc(l.text)}</div>`).join('');
@@ -161,9 +177,11 @@ styles.forEach((st, i) => {
   js.push(`tl.to('#row-${i}',{color:'${C.accent}',duration:.12},${t});`);
   js.push(`tl.to('#hl',{y:${r3(i * Math.min(92, 900 / n))},duration:.28,ease:'power3.out'},${t});`);
   if (i > 0) js.push(`tl.to('#row-${i - 1}',{color:'${C.ink}',duration:.2},${t});`);
-  // The new card swings in from the right; the last one tucks behind.
-  js.push(`tl.fromTo('#card-${i}',{x:420,rotation:9,scale:.86,opacity:0},{x:0,rotation:0,scale:1,opacity:1,duration:.42,ease:'back.out(1.3)'},${t});`);
-  js.push(`tl.fromTo('#shine-${i}',{xPercent:-160},{xPercent:160,duration:.6,ease:'power2.inOut'},${r3(t + 0.12)});`);
+  // The new card swings in from the right; the last one tucks behind. When the script has a
+  // spoken intro before the first style, the first card opens the reel so frame one moves.
+  const ct = i === 0 && OPEN_EARLY ? 0.25 : t;
+  js.push(`tl.fromTo('#card-${i}',{x:420,rotation:9,scale:.86,opacity:0},{x:0,rotation:0,scale:1,opacity:1,duration:.42,ease:'back.out(1.3)'},${ct});`);
+  js.push(`tl.fromTo('#shine-${i}',{xPercent:-160},{xPercent:160,duration:.6,ease:'power2.inOut'},${r3(ct + 0.12)});`);
   if (i > 0) js.push(`tl.to('#card-${i - 1}',{rotation:-5,x:-34,scale:.94,duration:.4,ease:'power2.out'},${t});`);
   if (i > 0) js.push(`tl.to('#inner-${i - 1} .tag',{opacity:0,duration:.15},${t});`);
   // Only two cards stay in the deck; older ones wait off stage for the grid.
@@ -175,7 +193,7 @@ js.push(`tl.to('#list',{x:-420,opacity:0,duration:.45,ease:'power2.in'},${at(T.g
 styles.forEach((st, i) => {
   const g = toTile(i);
   js.push(`tl.to('#card-${i}',{x:${g.x},y:${g.y},scale:${g.scale},rotation:0,opacity:1,duration:.7,ease:'power3.inOut'},${at(T.grid - 0.15 + i * 0.045)});`);
-  js.push(`tl.to('#gl-${i}',{opacity:1,y:0,duration:.3},${at(T.grid + 0.45 + i * 0.04)});`);
+  if (showLabels) js.push(`tl.to('#gl-${i}',{opacity:1,y:0,duration:.3},${at(T.grid + 0.45 + i * 0.04)});`);
   if (i === n - 1) js.push(`tl.to('#inner-${i} .tag',{opacity:0,duration:.2},${at(T.grid - 0.15)});`);
   // Each tile floats on its own phase so the grid breathes.
   // (on the inner layer, so it never fights the card's own move)
@@ -191,8 +209,8 @@ js.push(`tl.to('#pills',{opacity:0,y:-20,duration:.3},${at(gridOut - 0.2)});`);
 // Middle video in a phone.
 if (mid) {
   js.push(`tl.to('#deck',{opacity:.14,scale:.92,duration:.5,ease:'power2.inOut'},${at(T.middle - 0.3)});`);
-  js.push(`tl.to('.glabel',{opacity:0,duration:.25},${at(T.middle - 0.3)});`);
-  js.push(`tl.to('.glabel',{opacity:1,duration:.3},${at(T.cta + 0.2)});`);
+  if (showLabels) js.push(`tl.to('.glabel',{opacity:0,duration:.25},${at(T.middle - 0.3)});`);
+  if (showLabels) js.push(`tl.to('.glabel',{opacity:1,duration:.3},${at(T.cta + 0.2)});`);
   js.push(`tl.to('#header',{opacity:0,y:-30,duration:.3},${at(T.middle - 0.3)});`);
   js.push(`tl.fromTo('#phone',{y:1500,rotation:6},{y:0,rotation:0,duration:.75,ease:'power3.out'},${at(T.middle - 0.35)});`);
   js.push(`tl.fromTo('#midtag',{opacity:0,y:-16},{opacity:1,y:0,duration:.35},${at(T.middle)});`);
@@ -262,7 +280,7 @@ const html = `<!doctype html>
   .tag{position:absolute;left:22px;bottom:22px;display:flex;gap:12px;align-items:center;padding:12px 20px;border-radius:30px;background:rgba(255,255,255,.92);font:700 30px/1 Inter,sans-serif;color:${C.ink}}
   .tag span{font:700 28px/1 'JetBrains Mono',monospace;color:${C.payoff}}
   .glabel{position:absolute;text-align:center;font:700 28px/1.05 Inter,sans-serif;color:${C.ink};opacity:0;transform:translateY(10px);z-index:5}
-  #pills{position:absolute;left:0;right:0;top:${gridTop + rows * (tileH + 58) + 30}px;display:flex;justify-content:center;gap:16px;z-index:6}
+  #pills{position:absolute;left:0;right:0;top:${gridTop + rows * (tileH + labelGap) + 30}px;display:flex;justify-content:center;gap:16px;z-index:6}
   .pill{padding:16px 28px;border-radius:40px;background:#fff;font:700 34px/1 Inter,sans-serif;box-shadow:0 8px 24px -8px rgba(60,30,60,.35);opacity:0}
   .pill:last-child{background:${C.accent};color:#fff}
   .phone{position:absolute;left:${(1080 - 500) / 2}px;top:560px;width:500px;height:889px;border-radius:56px;overflow:hidden;border:12px solid #17141a;background:#000;box-shadow:0 40px 80px -24px rgba(40,10,40,.6);z-index:8}
@@ -270,14 +288,14 @@ const html = `<!doctype html>
   .sticker{position:absolute;right:16px;top:30px;padding:14px 22px;border-radius:16px;background:${C.accent};color:#fff;font:900 40px/1 Inter,sans-serif;letter-spacing:.02em;opacity:0}
   .midtag{position:absolute;left:0;right:0;top:300px;text-align:center;font:600 28px/1 'JetBrains Mono',monospace;color:${C.muted};opacity:0;z-index:8}
   .midtitle{position:absolute;left:0;right:0;top:360px;text-align:center;font:italic 400 110px/1 'Playfair Display',serif;color:${C.payoff};opacity:0;z-index:8}
-  #cta{position:absolute;left:0;right:0;top:${gridTop + rows * (tileH + 58) - 250 + 40}px;text-align:center;z-index:7}
+  #cta{position:absolute;left:0;right:0;top:${gridTop + rows * (tileH + labelGap) - 250 + 40}px;text-align:center;z-index:7}
   #ctaSmall{font:700 40px/1 Inter,sans-serif;color:${C.ink};opacity:0}
   #ctaWord{font:italic 400 168px/1.05 'Playfair Display',serif;color:${C.accent};letter-spacing:-.01em;margin-top:6px}
   #ctaWord .ch{display:inline-block;opacity:0}
   #ctaUnder{width:560px;height:10px;border-radius:5px;margin:4px auto 26px;background:${C.payoff};transform-origin:left center;transform:scaleX(0)}
   .cline{font:600 36px/1.5 Inter,sans-serif;color:${C.ink};opacity:0}
   .tick{display:inline-block;width:42px;height:42px;line-height:42px;border-radius:50%;background:${C.payoff};color:#fff;font-size:24px;margin-right:16px;vertical-align:4px}
-  #save{position:absolute;left:0;right:0;top:${gridTop + rows * (tileH + 58) - 250 + 60}px;text-align:center;opacity:0;z-index:7}
+  #save{position:absolute;left:0;right:0;top:${gridTop + rows * (tileH + labelGap) - 250 + 60}px;text-align:center;opacity:0;z-index:7}
   #mark{width:80px;height:104px;margin:0 auto 26px;background:${C.accent};clip-path:polygon(0 0,100% 0,100% 100%,50% 76%,0 100%)}
   #saveText{font:italic 400 130px/1 'Playfair Display',serif;color:${C.accent}}
   #saveText b{font:900 104px/1 Inter,sans-serif;color:${C.ink};font-style:normal;letter-spacing:-.03em}
